@@ -133,6 +133,13 @@ textarea.edit-field { resize: vertical; min-height: 72px; line-height: 1.55; }
 </head>
 <body>
 
+<div id="apiBar" style="background:#0a0d14;border-bottom:1px solid #2a3048;padding:10px 20px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+  <span style="font-size:0.75rem;font-weight:600;color:#7b82a0;white-space:nowrap;">🔑 Anthropic API Key</span>
+  <input id="apiKeyInput" type="password" placeholder="Paste your sk-ant-... key here"
+    style="flex:1;min-width:200px;background:#1e2335;border:1.5px solid #323b5a;border-radius:6px;padding:6px 12px;font-size:0.8rem;color:#e8eaf2;outline:none;font-family:sans-serif;" />
+  <span id="apiKeyStatus" style="font-size:0.75rem;color:#7b82a0;white-space:nowrap;"></span>
+  <a href="https://console.anthropic.com" target="_blank" style="font-size:0.72rem;color:#d4a847;text-decoration:none;white-space:nowrap;">Get key →</a>
+</div>
 <div class="header">
   <div>
     <div class="logo">⚖ Case Intake</div>
@@ -230,6 +237,19 @@ function showView(id,btn){
   btn.classList.add('active');
   if(id==='queue')renderQueue();
   renderStats();
+
+function getApiKey(){return document.getElementById('apiKeyInput').value.trim()||localStorage.getItem('anthropicKey')||'';}
+function initApiKey(){
+  var k=localStorage.getItem('anthropicKey')||'';
+  if(k){document.getElementById('apiKeyInput').value=k;document.getElementById('apiKeyStatus').textContent='✓ Saved';document.getElementById('apiKeyStatus').style.color='#3dbb7a';}
+  document.getElementById('apiKeyInput').addEventListener('change',function(){
+    localStorage.setItem('anthropicKey',this.value.trim());
+    document.getElementById('apiKeyStatus').textContent=this.value.trim()?'✓ Saved':'';
+    document.getElementById('apiKeyStatus').style.color='#3dbb7a';
+  });
+}
+
+initApiKey();
 }
 
 function handleFile(input){
@@ -255,6 +275,14 @@ async function analyze(){
   const desc=document.getElementById('desc').value.trim();
   if(!desc&&!curFile){document.getElementById('desc').style.borderColor='var(--red)';setTimeout(()=>document.getElementById('desc').style.borderColor='',1500);return;}
 
+  var apiKey=getApiKey();
+  if(!apiKey){
+    document.getElementById('apiKeyInput').style.borderColor='#e05555';
+    document.getElementById('apiKeyStatus').textContent='Please enter your API key above';
+    document.getElementById('apiKeyStatus').style.color='#e05555';
+    document.getElementById('apiBar').scrollIntoView({behavior:'smooth'});
+    return;
+  }
   const btn=document.getElementById('analyzeBtn');
   btn.classList.add('loading');btn.disabled=true;
   document.getElementById('resultArea').innerHTML='';
@@ -293,7 +321,7 @@ High priority: child safety, DV evidence, order violations. Medium: pattern evid
 
     const res=await fetch('https://api.anthropic.com/v1/messages',{
       method:'POST',
-      headers:{'Content-Type':'application/json'},
+      headers:{'Content-Type':'application/json','x-api-key':getApiKey(),'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
       body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,system:SYSTEM,messages:[{role:'user',content}]})
     });
     const json=await res.json();
@@ -379,6 +407,19 @@ function saveEntry(addTL){
   }
   log.unshift({id:uid(),savedAt:new Date().toISOString(),docTitle,binderId:r.binderId,priority:r.priority,addedToTimeline:!!(addTL&&r.verdict==='TIMELINE'),date:r.date||''});
   save();renderStats();
+
+function getApiKey(){return document.getElementById('apiKeyInput').value.trim()||localStorage.getItem('anthropicKey')||'';}
+function initApiKey(){
+  var k=localStorage.getItem('anthropicKey')||'';
+  if(k){document.getElementById('apiKeyInput').value=k;document.getElementById('apiKeyStatus').textContent='✓ Saved';document.getElementById('apiKeyStatus').style.color='#3dbb7a';}
+  document.getElementById('apiKeyInput').addEventListener('change',function(){
+    localStorage.setItem('anthropicKey',this.value.trim());
+    document.getElementById('apiKeyStatus').textContent=this.value.trim()?'✓ Saved':'';
+    document.getElementById('apiKeyStatus').style.color='#3dbb7a';
+  });
+}
+
+initApiKey();
   document.getElementById('savedMsg').classList.add('show');
   document.querySelectorAll('.result-actions .btn').forEach(b=>b.disabled=true);
   setTimeout(()=>{
@@ -404,6 +445,19 @@ function renderStats(){
 
 function renderQueue(){
   renderStats();
+
+function getApiKey(){return document.getElementById('apiKeyInput').value.trim()||localStorage.getItem('anthropicKey')||'';}
+function initApiKey(){
+  var k=localStorage.getItem('anthropicKey')||'';
+  if(k){document.getElementById('apiKeyInput').value=k;document.getElementById('apiKeyStatus').textContent='✓ Saved';document.getElementById('apiKeyStatus').style.color='#3dbb7a';}
+  document.getElementById('apiKeyInput').addEventListener('change',function(){
+    localStorage.setItem('anthropicKey',this.value.trim());
+    document.getElementById('apiKeyStatus').textContent=this.value.trim()?'✓ Saved':'';
+    document.getElementById('apiKeyStatus').style.color='#3dbb7a';
+  });
+}
+
+initApiKey();
   const el=document.getElementById('queueList');
   const empty=document.getElementById('queueEmpty');
   if(log.length===0){el.innerHTML='';empty.style.display='block';return;}
@@ -425,6 +479,19 @@ function renderQueue(){
 }
 
 renderStats();
+
+function getApiKey(){return document.getElementById('apiKeyInput').value.trim()||localStorage.getItem('anthropicKey')||'';}
+function initApiKey(){
+  var k=localStorage.getItem('anthropicKey')||'';
+  if(k){document.getElementById('apiKeyInput').value=k;document.getElementById('apiKeyStatus').textContent='✓ Saved';document.getElementById('apiKeyStatus').style.color='#3dbb7a';}
+  document.getElementById('apiKeyInput').addEventListener('change',function(){
+    localStorage.setItem('anthropicKey',this.value.trim());
+    document.getElementById('apiKeyStatus').textContent=this.value.trim()?'✓ Saved':'';
+    document.getElementById('apiKeyStatus').style.color='#3dbb7a';
+  });
+}
+
+initApiKey();
 </script>
 </body>
 </html>
